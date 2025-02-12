@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace BitfinexConnector.Core.Services
 {
-    class PortfolioService
+    public class PortfolioService
     {
-        private readonly IRestClient _restClient;
+        readonly IRestClient _restClient;
         private Dictionary<string, decimal> _assets = new Dictionary<string, decimal>
         {
             ["BTC"] = 1m,
@@ -18,7 +18,7 @@ namespace BitfinexConnector.Core.Services
             ["DASH"] = 30m
         };
 
-        public PortfolioService(IRestClient restClient) => _restClient = restClient;
+        PortfolioService(IRestClient restClient) => _restClient = restClient;
 
         public async Task<Dictionary<string, decimal>> CalculatePortfolioInAllCurrenciesAsync()
         {

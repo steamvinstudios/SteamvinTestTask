@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitfinexConnector.Core", "SteamvinConnector\BitfinexConnector.Core.csproj", "{3BC52614-3294-426F-AB07-7855C618E283}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitfinexConnector.WPF", "SteamvinWPFTask\BitfinexConnector.WPF.csproj", "{6D28619D-A7B0-4611-8BF1-F7CA19886111}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3BC52614-3294-426F-AB07-7855C618E283} = {3BC52614-3294-426F-AB07-7855C618E283}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BitfinexConnector.Tests", "BitfinexConnector.Tests\BitfinexConnector.Tests.csproj", "{FE364A0C-4498-408F-8A5C-96AF2BE83132}"
 EndProject
