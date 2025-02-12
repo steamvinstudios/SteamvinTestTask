@@ -11,15 +11,29 @@ namespace BitfinexConnector.Core.Clients
 {
     class BitfinexWebSocketClient : IWebSocketClient
     {
-        private ClientWebSocket _webSocket = new ClientWebSocket();
+        private int _connectionCount = 0;
+        private DateTime _lastConnectionTime = DateTime.MinValue;
 
         public event Action<Trade> OnTradeReceived;
         public event Action<Candle> OnCandleReceived;
 
-        public async Task ConnectAsync()
+        public async Task ConnectAsync(bool isAuthenticated = false)
         {
-            await _webSocket.ConnectAsync(new Uri("wss://api.bitfinex.com/ws/2"), CancellationToken.None);
-            await ListenForMessages();
+            // обработка ограничений на подключения
+            if (isAuthenticated && _connectionCount >= 5)
+                throw new RateLimitException("Max 5 authenticated connections per 15s");
+
+            var baseUrl = isAuthenticated ? "wss://api.bitfinex.com/ws/2" : "wss://api-pub.bitfinex.com/ws/2";
+            await _webSocket.ConnectAsync(new Uri(baseUrl), CancellationToken.None);
+
+            // обновление счетчик подключений
+            _connectionCount++;
+            _lastConnectionTime = DateTime.UtcNow;
+        }
+
+        public Task ConnectAsync()
+        {
+            throw new NotImplementedException();
         }
 
         public Task SubscribeToCandlesAsync(string symbol, string timeframe)
@@ -27,25 +41,16 @@ namespace BitfinexConnector.Core.Clients
             throw new NotImplementedException();
         }
 
+        // обработка деривативов
+        public Task SubscribeToDerivatives(string symbol)
+        {
+            var msg = $"{{\"event\":\"subscribe\", \"channel\":\"trades\", \"symbol\":\"{symbol}\"}}";
+            return SendWebSocketMessage(msg);
+        }
+
         public Task SubscribeToTradesAsync(string symbol)
         {
             throw new NotImplementedException();
-        }
-
-        private async Task ListenForMessages()
-        {
-            var buffer = new byte[1024];
-            while (_webSocket.State == WebSocketState.Open)
-            {
-                var result = await _webSocket.ReceiveAsync(buffer, CancellationToken.None);
-                var message = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                ProcessMessage(message);
-            }
-        }
-
-        private void ProcessMessage(string message)
-        {
-
         }
     }
 }

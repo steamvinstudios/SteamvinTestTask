@@ -33,6 +33,17 @@ namespace BitfinexConnector.Core.Services
             return results;
         }
 
+        private async Task<decimal> FetchConversionRate(string from, string to)
+        {
+            // для маржинальных валют используются символы с 'f'
+            var symbol = from.StartsWith("f") || to.StartsWith("f")
+                ? $"f{from}{to}"
+                : $"t{from}{to}";
+
+            var ticker = await _restClient.GetTickerAsync(symbol);
+            return ticker.LastPrice;
+        }
+
         private async Task<decimal> ConvertAsset(string from, decimal amount, string to)
         {
             if (from == to) return amount;
