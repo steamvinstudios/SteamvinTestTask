@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BitfinexConnector.WPF.Models
+﻿namespace BitfinexConnector.WPF.Models
 {
     public class PortfolioItem
     {
-
+        public string Currency { get; set; }
+        public decimal Balance { get; set; }
     }
 }

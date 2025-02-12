@@ -1,47 +1,37 @@
-﻿using BitfinexConnector.Core.Converters;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace BitfinexConnector.Core.Models
 {
     public class Trade
     {
-        [JsonProperty(2)]
-        [JsonConverter(typeof(DecimalFormatConverter), 8)] // 8 знаков для Amount
-        public decimal Amount { get; set; }
-
-        [JsonProperty(3)]
-        [JsonConverter(typeof(DecimalFormatConverter), 5)] // 5 знаков для Price
-        public decimal Price { get; set; }
-        // Учитываем формат массивов вместо объектов
-        [JsonProperty(Order = 1)]
-        public long Id { get; set; }
-
-        [JsonProperty(Order = 2)]
-        public long Timestamp { get; set; } // В миллисекундах
-
-        [JsonProperty(Order = 3)]
-        [JsonConverter(typeof(DecimalFormatConverter), 8)] // Округление до 8 знаков
         /// <summary>
-        /// Валютная пара
+        /// Валютная пара.
         /// </summary>
         public string Pair { get; set; }
 
+        /// <summary>
+        /// Цена трейда.
+        /// </summary>
+        public decimal Price { get; set; }
 
         /// <summary>
-        /// Направление (buy/sell)
+        /// Объем трейда.
+        /// </summary>
+        public decimal Amount { get; set; }
+
+        /// <summary>
+        /// Направление (buy/sell).
         /// </summary>
         public string Side { get; set; }
 
         /// <summary>
-        /// Время трейда
+        /// Время трейда.
         /// </summary>
         public DateTimeOffset Time { get; set; }
 
-
+        /// <summary>
+        /// Идентификатор трейда.
+        /// </summary>
+        public string Id { get; set; }
     }
 }

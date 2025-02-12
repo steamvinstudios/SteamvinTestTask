@@ -1,59 +1,68 @@
-﻿using BitfinexConnector.Core.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using BitfinexConnector.Core.Clients.Rest;
+using BitfinexConnector.Core.Models;
 
 namespace BitfinexConnector.Core.Services
 {
     public class PortfolioService
     {
-        readonly IRestClient _restClient;
-        private Dictionary<string, decimal> _assets = new Dictionary<string, decimal>
+        // Исходный баланс портфеля
+        private readonly Dictionary<string, decimal> _portfolio = new Dictionary<string, decimal>
         {
-            ["BTC"] = 1m,
-            ["XRP"] = 15000m,
-            ["XMR"] = 50m,
-            ["DASH"] = 30m
+            { "BTC", 1m },
+            { "XRP", 15000m },
+            { "XMR", 50m },
+            { "DASH", 30m }
         };
 
-        PortfolioService(IRestClient restClient) => _restClient = restClient;
+        // Целевые валюты для отображения
+        private readonly string[] _targetCurrencies = new string[] { "USDT", "BTC", "XRP", "XMR", "DASH" };
 
-        public async Task<Dictionary<string, decimal>> CalculatePortfolioInAllCurrenciesAsync()
+        private readonly BitfinexRestClient _restClient;
+
+        public PortfolioService()
         {
-            var results = new Dictionary<string, decimal>();
-            foreach (var targetCurrency in new[] { "USDT", "BTC", "XRP", "XMR", "DASH" })
+            _restClient = new BitfinexRestClient();
+        }
+
+        /// <summary>
+        /// Расчет баланса портфеля в разных валютах.
+        /// Для конвертации используется тикер пары, например, для BTC->USDT: tBTCUSDT.
+        /// Если актив совпадает с целевой валютой, конвертация не требуется.
+        /// </summary>
+        public async Task<Dictionary<string, decimal>> CalculatePortfolioAsync()
+        {
+            var result = new Dictionary<string, decimal>();
+
+            foreach (var target in _targetCurrencies)
             {
-                decimal total = 0;
-                foreach (var (currency, amount) in _assets)
-                    total += await ConvertAsset(currency, amount, targetCurrency);
-                results[targetCurrency] = total;
+                decimal total = 0m;
+                foreach (var asset in _portfolio)
+                {
+                    if (asset.Key.Equals(target, StringComparison.OrdinalIgnoreCase))
+                    {
+                        total += asset.Value;
+                    }
+                    else
+                    {
+                        string pair = $"t{asset.Key}{target}";
+                        try
+                        {
+                            Ticker ticker = await _restClient.GetTickerAsync(pair);
+                            total += asset.Value * ticker.LastPrice;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Ошибка получения котировки для {pair}: {ex.Message}");
+                        }
+                    }
+                }
+                result[target] = total;
             }
-            return results;
-        }
 
-        private async Task<decimal> FetchConversionRate(string from, string to)
-        {
-            // для маржинальных валют используются символы с 'f'
-            var symbol = from.StartsWith("f") || to.StartsWith("f")
-                ? $"f{from}{to}"
-                : $"t{from}{to}";
-
-            var ticker = await _restClient.GetTickerAsync(symbol);
-            return ticker.LastPrice;
-        }
-
-        private async Task<decimal> ConvertAsset(string from, decimal amount, string to)
-        {
-            if (from == to) return amount;
-            var rate = await FetchConversionRate(from, to);
-            return amount * rate;
-        }
-
-        private async Task<decimal> FetchConversionRate(string from, string to)
-        {
-
+            return result;
         }
     }
 }

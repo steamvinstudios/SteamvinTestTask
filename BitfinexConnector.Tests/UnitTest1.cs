@@ -1,4 +1,5 @@
-﻿using BitfinexConnector.Core.Clients;
+﻿using BitfinexConnector.Clients.Rest;
+using BitfinexConnector.Core.Clients;
 
 namespace BitfinexConnector.Tests
 {

@@ -1,26 +1,26 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace BitfinexConnector.Core.Converters
 {
     public class DecimalFormatConverter : JsonConverter
     {
-
         private readonly int _precision;
         public DecimalFormatConverter(int precision) => _precision = precision;
 
         public override bool CanConvert(Type objectType)
         {
-            throw new NotImplementedException();
+            return objectType == typeof(decimal) || objectType == typeof(decimal?);
         }
 
-        public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            throw new NotImplementedException();
+            if (reader.Value == null)
+                return 0m;
+
+            if (decimal.TryParse(reader.Value.ToString(), out decimal result))
+                return Math.Round(result, _precision);
+            return 0m;
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

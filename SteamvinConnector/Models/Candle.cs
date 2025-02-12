@@ -1,53 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BitfinexConnector.Core.Models
 {
     public class Candle
     {
         /// <summary>
-        /// Валютная пара
+        /// Валютная пара.
         /// </summary>
         public string Pair { get; set; }
 
         /// <summary>
-        /// Цена открытия
+        /// Цена открытия.
         /// </summary>
         public decimal OpenPrice { get; set; }
 
         /// <summary>
-        /// Максимальная цена
+        /// Максимальная цена.
         /// </summary>
         public decimal HighPrice { get; set; }
 
         /// <summary>
-        /// Минимальная цена
+        /// Минимальная цена.
         /// </summary>
         public decimal LowPrice { get; set; }
 
         /// <summary>
-        /// Цена закрытия
+        /// Цена закрытия.
         /// </summary>
         public decimal ClosePrice { get; set; }
 
-
         /// <summary>
-        /// Partial (Общая сумма сделок)
+        /// Общая сумма сделок.
         /// </summary>
         public decimal TotalPrice { get; set; }
 
         /// <summary>
-        /// Partial (Общий объем)
+        /// Общий объем.
         /// </summary>
         public decimal TotalVolume { get; set; }
 
         /// <summary>
-        /// Время
+        /// Время открытия свечи.
         /// </summary>
         public DateTimeOffset OpenTime { get; set; }
-
     }
 }

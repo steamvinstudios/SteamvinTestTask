@@ -1,20 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using BitfinexConnector.Core.Services;
+using BitfinexConnector.WPF.Models;
 using System.Threading.Tasks;
-using BitfinexConnector.Core.Interfaces;
 
 namespace BitfinexConnector.WPF.ViewModels
 {
-    class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly ITestConnector _connector;
+        private readonly PortfolioService _portfolioService;
+        public ObservableCollection<PortfolioItem> PortfolioItems { get; set; }
 
-        public MainViewModel(ITestConnector connector)
+        public MainViewModel()
         {
-            _connector = connector;
-            _connector.NewBuyTrade += OnNewBuyTrade;
+            _portfolioService = new PortfolioService();
+            PortfolioItems = new ObservableCollection<PortfolioItem>();
+            LoadPortfolio();
         }
+
+        private async void LoadPortfolio()
+        {
+            var portfolioData = await _portfolioService.CalculatePortfolioAsync();
+            PortfolioItems.Clear();
+            foreach (var item in portfolioData)
+            {
+                PortfolioItems.Add(new PortfolioItem
+                {
+                    Currency = item.Key,
+                    Balance = item.Value
+                });
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
