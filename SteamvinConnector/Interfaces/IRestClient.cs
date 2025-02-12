@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BitfinexConnector.Core.Interfaces
 {
-    interface IRestClient
+    public interface IRestClient
     {
         Task<IEnumerable<Trade>> GetTradesAsync(string symbol, DateTime start, DateTime end);
         Task<IEnumerable<Candle>> GetCandlesAsync(string symbol, string timeframe, DateTime start, DateTime end);

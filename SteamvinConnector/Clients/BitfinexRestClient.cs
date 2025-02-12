@@ -9,8 +9,20 @@ using System.Threading.Tasks;
 
 namespace BitfinexConnector.Core.Clients
 {
-    class BitfinexRestClient : IRestClient
+    public class BitfinexRestClient : IRestClient
     {
+        // базовые URL для публичных и приватных запросов
+        private const string PublicBaseUrl = "https://api-pub.bitfinex.com/v2/";
+        private const string PrivateBaseUrl = "https://api.bitfinex.com/v2/";
+
+        // обработка символов
+        private string NormalizeSymbol(string symbol)
+        {
+            if (!symbol.StartsWith("t") && !symbol.StartsWith("f"))
+                return $"t{symbol}"; // По умолчанию считаем торговую пару
+            return symbol;
+        }
+
         private readonly HttpClient _httpClient = new HttpClient
         {
             BaseAddress = new Uri("https://api.bitfinex.com/v2/")
@@ -18,7 +30,8 @@ namespace BitfinexConnector.Core.Clients
 
         public async Task<IEnumerable<Trade>> GetTradesAsync(string symbol, DateTime start, DateTime end)
         {
-            var endpoint = $"trades/{symbol}/hist?start={ToUnixMs(start)}&end={ToUnixMs(end)}";
+            var normalizedSymbol = NormalizeSymbol(symbol);
+            var endpoint = $"trades/{normalizedSymbol}/hist?start={ToUnixMs(start)}&end={ToUnixMs(end)}";
             var response = await _httpClient.GetStringAsync(endpoint);
             return JsonConvert.DeserializeObject<List<Trade>>(response);
         }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BitfinexConnector.Core.Interfaces
 {
-    interface IWebSocketClient
+    public interface IWebSocketClient
     {
         event Action<Trade> OnTradeReceived;
         event Action<Candle> OnCandleReceived;
