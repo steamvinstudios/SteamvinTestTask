@@ -6,7 +6,13 @@
         xmlns:local="clr-namespace:SteamvinWPFTask"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+    <DataGrid ItemsSource="{Binding Balances}"
+              AutoGenerateColumns="False">
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="Валюта"
+                                Binding="{Binding Currency}" />
+            <DataGridTextColumn Header="Сумма"
+                                Binding="{Binding Value}" />
+        </DataGrid.Columns>
+    </DataGrid>
 </Window>
